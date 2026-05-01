@@ -850,13 +850,16 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <div>© 2018 Better View Home Loans. All rights reserved.</div>
-                <div>Australian Credit Licence holder · Privacy Policy</div>
+                <div>© <span id="year">2026</span> Better View Home Loans. All rights reserved.</div>
+                <div>Australian Credit Licence holder</div>
             </div>
         </div>
     </footer>
 
     <script>
+        // Footer year
+        document.getElementById('year').textContent = new Date().getFullYear();
+
         // Duplicate testimonials for seamless marquee loop
         const track = document.getElementById('marqueeTrack');
         if (track) track.innerHTML += track.innerHTML;
