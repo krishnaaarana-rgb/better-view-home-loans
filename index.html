@@ -360,36 +360,62 @@
         @media (max-width: 900px) { .approach-grid { grid-template-columns: 1fr; gap: 50px; } }
 
         /* ── Testimonials ────────────────────────────────── */
-        .testimonials { background: #fff; }
-        .testimonial-grid {
-            column-count: 2;
-            column-gap: 32px;
+        .testimonials { background: #fff; overflow: hidden; }
+        .testimonials .container { max-width: none; padding: 0; }
+        .testimonials .section-head { padding: 0 24px; max-width: 720px; margin-left: auto; margin-right: auto; text-align: center; }
+
+        .marquee {
+            position: relative;
+            overflow: hidden;
+            -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+            mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
         }
-        @media (max-width: 720px) { .testimonial-grid { column-count: 1; } }
+        .marquee-track {
+            display: flex;
+            gap: 28px;
+            width: max-content;
+            animation: marquee 60s linear infinite;
+        }
+        .marquee:hover .marquee-track { animation-play-state: paused; }
+        @keyframes marquee {
+            from { transform: translateX(-50%); }
+            to   { transform: translateX(0); }
+        }
+
         .testimonial {
+            flex: 0 0 380px;
             background: var(--bg-cream);
-            padding: 38px;
-            margin-bottom: 32px;
-            break-inside: avoid;
+            padding: 36px 34px;
             border-left: 2px solid var(--accent);
+            display: flex;
+            flex-direction: column;
+            min-height: 360px;
         }
         .testimonial p {
             font-size: 15.5px;
-            line-height: 1.75;
+            line-height: 1.7;
             color: var(--navy);
-            margin-bottom: 24px;
             font-family: 'Source Serif 4', serif;
             font-weight: 400;
+            flex: 1;
+            margin-bottom: 24px;
         }
-        .testimonial p + p { margin-top: -12px; }
         .testimonial-author {
-            font-size: 13px;
+            font-size: 12px;
             color: var(--navy);
             font-weight: 600;
             border-top: 1px solid var(--border);
-            padding-top: 18px;
+            padding-top: 16px;
             text-transform: uppercase;
-            letter-spacing: 0.12em;
+            letter-spacing: 0.14em;
+        }
+        @media (max-width: 720px) {
+            .testimonial { flex-basis: 300px; padding: 28px 26px; min-height: 340px; }
+            .marquee-track { gap: 20px; animation-duration: 50s; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .marquee-track { animation: none; transform: translateX(0); }
+            .marquee { overflow-x: auto; mask-image: none; -webkit-mask-image: none; }
         }
 
         /* ── Contact ─────────────────────────────────────── */
@@ -686,36 +712,28 @@
                 <p>Reviews from clients who've worked with James on home purchases, refinancing and investment property finance.</p>
             </div>
 
-            <div class="testimonial-grid">
-                <div class="testimonial reveal">
-                    <p>"I recently had the pleasure of arranging finance to purchase a property on the north shore in Sydney through Better View Home Loans in Crows Nest. I did my research with all the large banks before committing to BVHL and none of them could go close to the mortgage loan rate offered through BVHL."</p>
-                    <p>"Apart from the rate, I can honestly say that without the help and assistance of James who we dealt with there, we would have likely missed out on the property in Killara. We felt that we needed to move quickly on the property and make an offer before auction. To do this we needed a mortgage broker who could also move quickly. James went above and beyond to help us at every stage and I've never seen anyone in any service industry be as efficient, thorough or accessible."</p>
-                    <p>"We were able to make our offer the day we saw the property and we were able to settle within a few weeks. The real estate agent mentioned she'd never seen any mortgage broker move as quickly and efficiently as James had and without his help we would have likely missed out on securing this property before auction. If you are looking for the best mortgage rate and the most efficient and attentive service available we highly recommend James Sterndale-Smith at BVHL in Crows Nest."</p>
-                    <div class="testimonial-author">David Chippendale</div>
-                </div>
-
-                <div class="testimonial reveal">
-                    <p>"We were lucky enough to have James as our mortgage broker to assist in purchasing our investment property. He was recommended to us by a close friend and we can definitely see why."</p>
-                    <p>"Firstly, James was excellent at coordinating and managing the whole purchasing process for us. He was very persistent and proactive when dealing with real estate agents, conveyancers and the banks. These qualities meant that we had a smooth and straightforward experience when making this major purchase."</p>
-                    <p>"Being a superb broker, he also made us feel extremely supported throughout the whole process. He created a real sense immediately that he was in our corner and this continued until the end. This support was displayed by James always being available to talk to. If we missed him over the phone, he would get back in touch pretty soon after."</p>
-                    <p>"Additionally, James was extremely effective in searching for the best bank with the best interest rates that suited us. We have no hesitation in recommending James as an excellent mortgage broker and we will definitely be retaining his services in the future."</p>
-                    <div class="testimonial-author">Kane and Louise M.</div>
-                </div>
-
-                <div class="testimonial reveal">
-                    <p>"We purchased an investment property in the last month, the entire process from application through to settlement was exceptionally well managed and communication was brilliant to say the least. James had a genuine interest in our journey and made himself completely available at any time. I would highly recommend James to anyone looking for a real expert and professional."</p>
-                    <div class="testimonial-author">Kevin Hodge</div>
-                </div>
-
-                <div class="testimonial reveal">
-                    <p>"I couldn't recommend James Sterndale-Smith enough, he has made this whole process of purchasing our new home so easy and stress free. James kept us informed all the way from the application stage all the way through to exchange, even called us personally to congratulate us on our new purchase. This type of personal approach goes a long way."</p>
-                    <p>"If you're looking for personal service from a true experienced professional you can't go past James from BVHL Lane Cove."</p>
-                    <div class="testimonial-author">Duncan Drummond</div>
-                </div>
-
-                <div class="testimonial reveal">
-                    <p>"James from Better View Home Loans in Lane Cove was amazing to deal with and secured us a fantastic rate. With James' help we were able to refinance our investment property and quickly secure our new home with ease. The service was really personalised and I could not recommend this company enough! Thanks again."</p>
-                    <div class="testimonial-author">Yvette Penprase</div>
+            <div class="marquee" aria-label="Client testimonials carousel">
+                <div class="marquee-track" id="marqueeTrack">
+                    <div class="testimonial">
+                        <p>"I did my research with all the large banks before committing to BVHL and none of them could go close to the mortgage loan rate offered. The real estate agent mentioned she'd never seen any mortgage broker move as quickly and efficiently as James had."</p>
+                        <div class="testimonial-author">David Chippendale</div>
+                    </div>
+                    <div class="testimonial">
+                        <p>"James was excellent at coordinating and managing the whole purchasing process. He was very persistent and proactive with real estate agents, conveyancers and the banks. He created a real sense immediately that he was in our corner."</p>
+                        <div class="testimonial-author">Kane and Louise M.</div>
+                    </div>
+                    <div class="testimonial">
+                        <p>"We purchased an investment property in the last month. The entire process from application through to settlement was exceptionally well managed and communication was brilliant. James had a genuine interest in our journey and made himself completely available at any time."</p>
+                        <div class="testimonial-author">Kevin Hodge</div>
+                    </div>
+                    <div class="testimonial">
+                        <p>"I couldn't recommend James Sterndale-Smith enough. He has made this whole process of purchasing our new home so easy and stress free. James kept us informed all the way from the application stage through to exchange, even called us personally to congratulate us on our new purchase."</p>
+                        <div class="testimonial-author">Duncan Drummond</div>
+                    </div>
+                    <div class="testimonial">
+                        <p>"James from Better View Home Loans in Lane Cove was amazing to deal with and secured us a fantastic rate. With James' help we were able to refinance our investment property and quickly secure our new home with ease. The service was really personalised."</p>
+                        <div class="testimonial-author">Yvette Penprase</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -839,6 +857,10 @@
     </footer>
 
     <script>
+        // Duplicate testimonials for seamless marquee loop
+        const track = document.getElementById('marqueeTrack');
+        if (track) track.innerHTML += track.innerHTML;
+
         // Mobile menu
         const menuBtn = document.getElementById('menuBtn');
         const nav = document.getElementById('nav');
