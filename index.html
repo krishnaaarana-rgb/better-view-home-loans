@@ -121,7 +121,21 @@
             border: none;
             cursor: pointer;
             color: var(--navy);
+            padding: 8px;
+            margin: -8px;
         }
+        .menu-btn .bar {
+            display: block;
+            width: 22px;
+            height: 1.6px;
+            background: var(--navy);
+            margin: 5px 0;
+            transition: transform 0.25s ease, opacity 0.2s ease;
+            transform-origin: center;
+        }
+        .menu-btn.open .bar:nth-child(1) { transform: translateY(6.6px) rotate(45deg); }
+        .menu-btn.open .bar:nth-child(2) { opacity: 0; }
+        .menu-btn.open .bar:nth-child(3) { transform: translateY(-6.6px) rotate(-45deg); }
         @media (max-width: 900px) {
             nav { display: none; position: absolute; top: 100%; left: 0; right: 0; background: #fff; border-bottom: 1px solid var(--border); padding: 16px 24px; }
             nav.open { display: block; }
@@ -544,6 +558,169 @@
         /* Subtle reveal */
         .reveal { opacity: 0; transform: translateY(16px); transition: opacity 0.6s ease, transform 0.6s ease; }
         .reveal.in { opacity: 1; transform: translateY(0); }
+
+        /* ── Mobile optimisation ─────────────────────────── */
+        html, body { overflow-x: hidden; }
+        a, button { -webkit-tap-highlight-color: rgba(139, 111, 63, 0.15); }
+
+        @media (max-width: 720px) {
+            .container { padding: 0 18px; }
+            section { padding: 56px 0; }
+
+            /* Topbar */
+            .topbar { font-size: 12px; padding: 8px 0; }
+            .topbar .container { gap: 12px; }
+            .topbar-left { gap: 14px; flex-wrap: wrap; }
+
+            /* Header */
+            .header-inner { padding: 14px 0; }
+            .logo { gap: 10px; }
+            .logo-mark { width: 38px; height: 38px; font-size: 18px; border-width: 1px; }
+            .logo-text { font-size: 15px; }
+            .logo-sub { font-size: 9.5px; letter-spacing: 0.14em; }
+            .menu-btn { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; }
+            nav { padding: 8px 18px 18px; box-shadow: 0 8px 16px -8px rgba(0,0,0,0.08); }
+            nav ul { gap: 0; }
+            nav a {
+                padding: 16px 0;
+                font-size: 16px;
+                border-bottom: 1px solid var(--border) !important;
+            }
+            nav a.nav-cta {
+                padding: 14px 0 !important;
+                margin-top: 14px;
+                border-bottom: none !important;
+                background: var(--navy);
+                color: #fff !important;
+            }
+            nav ul li:nth-last-child(2) a { border-bottom: none !important; }
+
+            /* Hero */
+            .hero { padding: 36px 0 0; }
+            .hero-grid { gap: 32px; }
+            .hero h1 {
+                font-size: clamp(28px, 8vw, 36px);
+                margin-bottom: 16px;
+                line-height: 1.15;
+            }
+            .hero p.lead { font-size: 16px; margin-bottom: 26px; line-height: 1.55; }
+            .eyebrow { font-size: 11px; margin-bottom: 14px; letter-spacing: 0.18em; }
+            .hero-cta { gap: 10px; }
+            .hero-cta .btn { flex: 1 1 0; justify-content: center; min-width: 140px; }
+            .hero-image { aspect-ratio: 4 / 3; }
+            .hero-strip { margin-top: 32px; }
+            .hero-strip .container {
+                padding-top: 18px; padding-bottom: 18px;
+                gap: 10px; font-size: 13.5px;
+            }
+            .hero-strip .label { font-size: 10.5px; }
+
+            /* Section heads */
+            .section-head { margin-bottom: 36px; }
+            .section-head h2 {
+                font-size: clamp(24px, 6.4vw, 30px);
+                margin: 10px 0 14px;
+            }
+            .section-head p { font-size: 15.5px; line-height: 1.6; }
+
+            /* Buttons */
+            .btn { padding: 13px 22px; font-size: 13.5px; }
+            .btn-ghost { padding: 11.5px 20.5px; }
+
+            /* Services */
+            .services-grid { border-left: none; border-top: none; }
+            .service { border-right: none; }
+            .service:last-child { border-bottom: none; }
+            .service-image { aspect-ratio: 16 / 10; }
+            .service-body { padding: 26px 22px 30px; }
+            .service h3 { font-size: 19px; }
+            .service p { font-size: 14.5px; margin-bottom: 20px; line-height: 1.65; }
+            .service-num { margin-bottom: 14px; font-size: 12px; }
+
+            /* Approach */
+            .approach-grid { gap: 36px; }
+            .approach-list { gap: 26px; }
+            .approach-item { grid-template-columns: 46px 1fr; gap: 16px; }
+            .approach-item .num { font-size: 21px; padding-top: 7px; }
+            .approach-item h3 { font-size: 17px; }
+            .approach-item p { font-size: 14.5px; line-height: 1.6; }
+
+            /* Testimonials */
+            .testimonials .section-head { padding: 0 18px; }
+
+            /* Contact */
+            .contact-grid { gap: 40px; }
+            .contact-info { gap: 22px; }
+            .contact-row {
+                grid-template-columns: 70px 1fr;
+                gap: 14px;
+                padding-bottom: 18px;
+            }
+            .contact-row .label { font-size: 10px; padding-top: 5px; letter-spacing: 0.18em; }
+            .contact-row .value { font-size: 17px; }
+            .contact-row .value-sub { font-size: 13px; }
+            .map-wrap { margin-top: 28px; }
+            .map-wrap iframe { height: 220px; }
+
+            /* Form */
+            form { gap: 16px; }
+            form .btn {
+                width: 100%;
+                align-self: stretch;
+                justify-content: center;
+                margin-top: 8px;
+            }
+
+            /* Footer */
+            footer { padding: 40px 0 24px; }
+            .footer-top {
+                grid-template-columns: 1fr;
+                gap: 28px;
+                padding-bottom: 28px;
+            }
+            .footer-brand p { max-width: none; }
+            .footer-bottom {
+                flex-direction: column;
+                gap: 8px;
+                align-items: flex-start;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container { padding: 0 16px; }
+            section { padding: 48px 0; }
+
+            .topbar-left { gap: 10px; font-size: 11.5px; }
+
+            .hero { padding: 28px 0 0; }
+            .hero h1 { font-size: 27px; }
+            .hero p.lead { font-size: 15px; }
+            .hero-cta { flex-direction: column; gap: 10px; }
+            .hero-cta .btn { width: 100%; }
+
+            .section-head h2 { font-size: 24px; }
+
+            .service-body { padding: 22px 18px 26px; }
+            .service h3 { font-size: 18px; }
+
+            .approach-item { grid-template-columns: 42px 1fr; gap: 14px; }
+            .approach-item .num { font-size: 19px; }
+
+            .testimonial {
+                flex-basis: 280px;
+                padding: 24px 22px;
+                min-height: 310px;
+            }
+            .testimonial p { font-size: 14.5px; line-height: 1.65; }
+            .marquee-track { gap: 16px; animation-duration: 45s; }
+
+            .contact-row {
+                grid-template-columns: 1fr;
+                gap: 4px;
+                padding-bottom: 18px;
+            }
+            .contact-row .label { padding-top: 0; }
+        }
     </style>
 </head>
 <body>
@@ -580,8 +757,10 @@
                     <li><a href="#contact" class="nav-cta">Book a Consultation</a></li>
                 </ul>
             </nav>
-            <button class="menu-btn" id="menuBtn" aria-label="Menu">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            <button class="menu-btn" id="menuBtn" aria-label="Menu" aria-expanded="false">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
             </button>
         </div>
     </header>
@@ -864,11 +1043,16 @@
         const track = document.getElementById('marqueeTrack');
         if (track) track.innerHTML += track.innerHTML;
 
-        // Mobile menu
+        // Mobile menu (with animated hamburger)
         const menuBtn = document.getElementById('menuBtn');
         const nav = document.getElementById('nav');
-        menuBtn.addEventListener('click', () => nav.classList.toggle('open'));
-        nav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => nav.classList.remove('open')));
+        const toggleNav = (open) => {
+            nav.classList.toggle('open', open);
+            menuBtn.classList.toggle('open', open);
+            menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        };
+        menuBtn.addEventListener('click', () => toggleNav(!nav.classList.contains('open')));
+        nav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => toggleNav(false)));
 
         // Reveal on scroll
         const io = new IntersectionObserver(entries => {
