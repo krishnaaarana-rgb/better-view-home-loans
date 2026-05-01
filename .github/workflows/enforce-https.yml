@@ -5,6 +5,12 @@ name: Enforce HTTPS on Pages
 #
 # Re-runs every 15 minutes until enforcement succeeds. Once enabled,
 # GitHub Pages keeps it on permanently and this workflow becomes a no-op.
+#
+# REQUIRES a repo secret called PAGES_PAT — a fine-grained Personal
+# Access Token with these repository permissions on this repo:
+#   - Pages: Read and write
+#   - Administration: Read and write
+# Create at: https://github.com/settings/personal-access-tokens/new
 
 on:
   workflow_dispatch:    # allow manual trigger
@@ -18,7 +24,6 @@ on:
 
 permissions:
   contents: read
-  pages: write
 
 jobs:
   enforce:
@@ -27,25 +32,39 @@ jobs:
       - name: Check current Pages state
         id: state
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.PAGES_PAT || secrets.GITHUB_TOKEN }}
         run: |
           state=$(gh api repos/${{ github.repository }}/pages)
           echo "$state"
           enforced=$(echo "$state" | jq -r '.https_enforced')
+          cert_state=$(echo "$state" | jq -r '.protected_domain_state // "null"')
           echo "enforced=$enforced" >> "$GITHUB_OUTPUT"
+          echo "cert_state=$cert_state" >> "$GITHUB_OUTPUT"
+
+      - name: Already enforced — exit cleanly
+        if: steps.state.outputs.enforced == 'true'
+        run: |
+          echo "✅ HTTPS already enforced — nothing to do"
+          echo "Consider deleting this workflow file."
 
       - name: Enable HTTPS enforcement
         if: steps.state.outputs.enforced == 'false'
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.PAGES_PAT }}
         run: |
-          if gh api -X PUT repos/${{ github.repository }}/pages -F https_enforced=true 2>&1; then
-            echo "✅ HTTPS enforcement enabled"
-          else
-            echo "⏳ Cert not ready yet — will retry on next schedule"
+          if [ -z "$GH_TOKEN" ]; then
+            echo "❌ PAGES_PAT secret not set — cannot enable HTTPS via Actions."
+            echo "   Add a fine-grained PAT with Pages + Administration write."
+            exit 1
+          fi
+          response=$(gh api -X PUT repos/${{ github.repository }}/pages -F https_enforced=true 2>&1)
+          if echo "$response" | grep -qi "certificate does not exist"; then
+            echo "⏳ Let's Encrypt cert not provisioned yet — will retry next run"
             exit 0
           fi
-
-      - name: Already enforced
-        if: steps.state.outputs.enforced == 'true'
-        run: echo "✅ HTTPS already enforced — nothing to do"
+          if echo "$response" | grep -qi "error\|message"; then
+            echo "❌ Unexpected response:"
+            echo "$response"
+            exit 1
+          fi
+          echo "✅ HTTPS enforcement enabled for bvhl.com.au"
