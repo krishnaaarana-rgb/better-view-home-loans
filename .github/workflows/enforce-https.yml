@@ -1,0 +1,52 @@
+name: Enforce HTTPS on Pages
+
+# Auto-enables HTTPS enforcement on the GitHub Pages site as soon as
+# the Let's Encrypt certificate has been provisioned for bvhl.com.au.
+#
+# Re-runs every 15 minutes until enforcement succeeds. Once enabled,
+# GitHub Pages keeps it on permanently and this workflow becomes a no-op.
+
+on:
+  workflow_dispatch:    # allow manual trigger
+  schedule:
+    - cron: '*/15 * * * *'   # every 15 minutes
+  push:
+    branches: [main]
+    paths:
+      - 'CNAME'
+      - '.github/workflows/enforce-https.yml'
+
+permissions:
+  contents: read
+  pages: write
+  administration: write
+
+jobs:
+  enforce:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check current Pages state
+        id: state
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          state=$(gh api repos/${{ github.repository }}/pages)
+          echo "$state"
+          enforced=$(echo "$state" | jq -r '.https_enforced')
+          echo "enforced=$enforced" >> "$GITHUB_OUTPUT"
+
+      - name: Enable HTTPS enforcement
+        if: steps.state.outputs.enforced == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if gh api -X PUT repos/${{ github.repository }}/pages -F https_enforced=true 2>&1; then
+            echo "✅ HTTPS enforcement enabled"
+          else
+            echo "⏳ Cert not ready yet — will retry on next schedule"
+            exit 0
+          fi
+
+      - name: Already enforced
+        if: steps.state.outputs.enforced == 'true'
+        run: echo "✅ HTTPS already enforced — nothing to do"
