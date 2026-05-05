@@ -1086,13 +1086,20 @@
                     body: data
                 });
                 const json = await res.json().catch(() => ({}));
-                if (!res.ok || json.success === 'false') throw new Error(json.message || 'Send failed');
+                if (!res.ok || json.success === 'false') {
+                    if (json.message && /activation/i.test(json.message)) {
+                        throw new Error('Form is awaiting one-time activation. Please try again in a moment.');
+                    }
+                    throw new Error(json.message || 'Send failed');
+                }
 
                 formStatus.textContent = '✓ Message sent. James will reply within one business day.';
                 formStatus.style.color = '#7ad27a';
                 form.reset();
             } catch (err) {
-                formStatus.textContent = 'Could not send. Please email james@bvhl.com.au directly.';
+                formStatus.textContent = err.message && err.message.length < 140
+                    ? err.message
+                    : 'Could not send. Please email james@bvhl.com.au directly.';
                 formStatus.style.color = '#f0a060';
             } finally {
                 submitBtn.disabled = false;
