@@ -906,6 +906,7 @@
 
             <div class="contact-grid">
                 <form id="contactForm" class="reveal">
+                    <input type="text" name="_honey" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;opacity:0;pointer-events:none" aria-hidden="true" />
                     <div class="field-row">
                         <div class="field">
                             <label for="name">Name</label>
@@ -1055,16 +1056,48 @@
             });
         });
 
-        // Contact form → mailto
+        // Contact form → FormSubmit.co (sends email straight to James)
         const form = document.getElementById('contactForm');
-        const status = document.getElementById('form-status');
-        form.addEventListener('submit', e => {
+        const formStatus = document.getElementById('form-status');
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const submitBtnLabel = submitBtn.textContent;
+
+        form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const d = new FormData(form);
-            const body = `Name: ${d.get('name')}\r\nEmail: ${d.get('email')}\r\nPhone: ${d.get('phone') || 'Not provided'}\r\n\r\n${d.get('message')}`;
-            window.location.href = `mailto:james@bvhl.com.au?subject=${encodeURIComponent(d.get('subject'))}&body=${encodeURIComponent(body)}`;
-            status.textContent = 'Opening your email client…';
-            setTimeout(() => { form.reset(); status.textContent = ''; }, 3000);
+
+            // Honeypot — bots fill hidden fields, real users don't
+            if (form.querySelector('[name="_honey"]').value) return;
+
+            const data = new FormData(form);
+            data.set('_subject', `BVHL enquiry: ${data.get('subject')}`);
+            data.set('_template', 'table');
+            data.set('_captcha', 'false');
+            data.set('_replyto', data.get('email'));
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Sending…';
+            formStatus.textContent = '';
+            formStatus.style.color = '';
+
+            try {
+                const res = await fetch('https://formsubmit.co/ajax/james@bvhl.com.au', {
+                    method: 'POST',
+                    headers: { 'Accept': 'application/json' },
+                    body: data
+                });
+                const json = await res.json().catch(() => ({}));
+                if (!res.ok || json.success === 'false') throw new Error(json.message || 'Send failed');
+
+                formStatus.textContent = '✓ Message sent. James will reply within one business day.';
+                formStatus.style.color = '#7ad27a';
+                form.reset();
+            } catch (err) {
+                formStatus.textContent = 'Could not send. Please email james@bvhl.com.au directly.';
+                formStatus.style.color = '#f0a060';
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = submitBtnLabel;
+            }
         });
     </script>
 </body>
