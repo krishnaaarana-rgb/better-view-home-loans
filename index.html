@@ -905,8 +905,12 @@
             </div>
 
             <div class="contact-grid">
-                <form id="contactForm" class="reveal">
+                <form id="contactForm" class="reveal" action="https://formsubmit.co/93f3d8626e9375005048e4d70659392e" method="POST">
                     <input type="text" name="_honey" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;opacity:0;pointer-events:none" aria-hidden="true" />
+                    <input type="hidden" name="_subject" value="BVHL website enquiry" />
+                    <input type="hidden" name="_template" value="table" />
+                    <input type="hidden" name="_captcha" value="false" />
+                    <input type="hidden" name="_next" value="https://bvhl.com.au/?sent=1#contact" />
                     <div class="field-row">
                         <div class="field">
                             <label for="name">Name</label>
@@ -1056,28 +1060,44 @@
             });
         });
 
-        // Contact form → FormSubmit.co (sends email straight to James)
+        // Contact form → FormSubmit.co with native-submit fallback
+        // (so it works even when ad blockers / Brave Shields block fetch)
         const form = document.getElementById('contactForm');
         const formStatus = document.getElementById('form-status');
         const submitBtn = form.querySelector('button[type="submit"]');
         const submitBtnLabel = submitBtn.textContent;
 
+        const showSuccess = () => {
+            formStatus.textContent = '✓ Message sent. James will reply within one business day.';
+            formStatus.style.color = '#7ad27a';
+        };
+
+        // If we just returned from a native FormSubmit POST, show the banner
+        if (new URLSearchParams(location.search).get('sent') === '1') {
+            showSuccess();
+            history.replaceState({}, '', location.pathname + location.hash);
+        }
+
         form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-
             // Honeypot — bots fill hidden fields, real users don't
-            if (form.querySelector('[name="_honey"]').value) return;
+            if (form.querySelector('[name="_honey"]').value) {
+                e.preventDefault();
+                return;
+            }
 
-            const data = new FormData(form);
-            data.set('_subject', `BVHL enquiry: ${data.get('subject')}`);
-            data.set('_template', 'table');
-            data.set('_captcha', 'false');
-            data.set('_replyto', data.get('email'));
+            // Update _subject with the real subject for the email
+            const subjectInput = form.querySelector('[name="_subject"]');
+            const userSubject = form.querySelector('[name="subject"]').value;
+            if (userSubject) subjectInput.value = `BVHL enquiry: ${userSubject}`;
 
+            e.preventDefault();
             submitBtn.disabled = true;
             submitBtn.textContent = 'Sending…';
             formStatus.textContent = '';
             formStatus.style.color = '';
+
+            const data = new FormData(form);
+            data.set('_replyto', data.get('email'));
 
             try {
                 const res = await fetch('https://formsubmit.co/ajax/93f3d8626e9375005048e4d70659392e', {
@@ -1092,18 +1112,18 @@
                     }
                     throw new Error(json.message || 'Send failed');
                 }
-
-                formStatus.textContent = '✓ Message sent. James will reply within one business day.';
-                formStatus.style.color = '#7ad27a';
+                showSuccess();
                 form.reset();
-            } catch (err) {
-                formStatus.textContent = err.message && err.message.length < 140
-                    ? err.message
-                    : 'Could not send. Please email james@bvhl.com.au directly.';
-                formStatus.style.color = '#f0a060';
-            } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = submitBtnLabel;
+            } catch (err) {
+                // AJAX failed — likely blocked by Brave Shields / ad blocker / offline.
+                // Fall back to a native form POST. FormSubmit will redirect back to
+                // ?sent=1 and the banner above will show.
+                console.warn('AJAX submit blocked, falling back to native POST:', err);
+                formStatus.textContent = 'Sending…';
+                formStatus.style.color = '';
+                form.submit();   // bypasses this listener; native browser POST
             }
         });
     </script>
